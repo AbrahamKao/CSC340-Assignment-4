@@ -25,18 +25,22 @@ void LinkedBag<ItemType>::sort(int method){
 	}
 }
 
-//TO DO: implement merge sort and change its prototype if you need to.
 template<class ItemType>
 void LinkedBag<ItemType>::mergeSort(){
-
-
+	if (headPtr == nullptr || headPtr->getNext() == nullptr) {
+		return;
+	}
+	headPtr = mergeSortHelper(headPtr);
 }
 
-//Extra Credit -- TO DO: implement quick sort and change its prototype 
-//                       if you need to.
 template<class ItemType>
 void LinkedBag<ItemType>::quickSort(){
+	if (headPtr == nullptr || headPtr->getNext() == nullptr) {
+		return;
+	}
 	
+	Node<ItemType>* tail = getTail(headPtr);
+	headPtr = quickSortHelper(headPtr, tail);
 }
 // --------------------------------------------------------------
 
@@ -238,5 +242,133 @@ Node<ItemType>* LinkedBag<ItemType>::getPointerTo(const ItemType& anEntry) const
 	
 	return curPtr;
 } // end getPointerTo
+
+template<class ItemType>
+Node<ItemType>* LinkedBag<ItemType>::mergeSortHelper(Node<ItemType>* head) {
+	if (head == nullptr || head->getNext() == nullptr) {
+		return head;
+	}
+	
+	Node<ItemType>* middle = getMiddle(head);
+	Node<ItemType>* nextToMiddle = middle->getNext();
+	middle->setNext(nullptr);
+	
+	Node<ItemType>* left = mergeSortHelper(head);
+	Node<ItemType>* right = mergeSortHelper(nextToMiddle);
+	
+	return merge(left, right);
+}
+
+template<class ItemType>
+Node<ItemType>* LinkedBag<ItemType>::getMiddle(Node<ItemType>* head) {
+	if (head == nullptr) return head;
+	
+	Node<ItemType>* slow = head;
+	Node<ItemType>* fast = head->getNext();
+	
+	while (fast != nullptr && fast->getNext() != nullptr) {
+		slow = slow->getNext();
+		fast = fast->getNext()->getNext();
+	}
+	
+	return slow;
+}
+
+template<class ItemType>
+Node<ItemType>* LinkedBag<ItemType>::merge(Node<ItemType>* left, Node<ItemType>* right) {
+	if (left == nullptr) return right;
+	if (right == nullptr) return left;
+	
+	Node<ItemType>* result = nullptr;
+	
+	if (left->getItem() <= right->getItem()) {
+		result = left;
+		result->setNext(merge(left->getNext(), right));
+	} else {
+		result = right;
+		result->setNext(merge(left, right->getNext()));
+	}
+	
+	return result;
+}
+
+template<class ItemType>
+Node<ItemType>* LinkedBag<ItemType>::quickSortHelper(Node<ItemType>* head, Node<ItemType>* tail) {
+	if (head == nullptr || head == tail) {
+		return head;
+	}
+	
+	Node<ItemType>* newHead = nullptr;
+	Node<ItemType>* newTail = nullptr;
+	
+	Node<ItemType>* pivot = partition(head, tail, &newHead, &newTail);
+	
+	if (newHead != pivot) {
+		Node<ItemType>* temp = newHead;
+		while (temp->getNext() != pivot) {
+			temp = temp->getNext();
+		}
+		temp->setNext(nullptr);
+		
+		newHead = quickSortHelper(newHead, temp);
+		
+		temp = getTail(newHead);
+		temp->setNext(pivot);
+	}
+	
+	pivot->setNext(quickSortHelper(pivot->getNext(), newTail));
+	
+	return newHead;
+}
+
+template<class ItemType>
+Node<ItemType>* LinkedBag<ItemType>::partition(Node<ItemType>* head, Node<ItemType>* tail,
+											 Node<ItemType>** newHead, Node<ItemType>** newTail) {
+	Node<ItemType>* pivot = tail;
+	Node<ItemType>* prev = nullptr;
+	Node<ItemType>* curr = head;
+	Node<ItemType>* smallerTail = pivot;
+	
+	*newHead = nullptr;
+	*newTail = pivot;
+	
+	while (curr != pivot) {
+		if (curr->getItem() < pivot->getItem()) {
+			if (*newHead == nullptr) {
+				*newHead = curr;
+			}
+			prev = curr;
+			curr = curr->getNext();
+		} else {
+			if (prev != nullptr) {
+				prev->setNext(curr->getNext());
+			}
+			
+			Node<ItemType>* temp = curr->getNext();
+			curr->setNext(nullptr);
+			smallerTail->setNext(curr);
+			smallerTail = curr;
+			curr = temp;
+		}
+	}
+	
+	if (*newHead == nullptr) {
+		*newHead = pivot;
+	}
+	
+	*newTail = smallerTail;
+	return pivot;
+}
+
+template<class ItemType>
+Node<ItemType>* LinkedBag<ItemType>::getTail(Node<ItemType>* head) {
+	if (head == nullptr) return nullptr;
+	
+	while (head->getNext() != nullptr) {
+		head = head->getNext();
+	}
+	
+	return head;
+}
 
 
