@@ -20,6 +20,17 @@ class LinkedBag : public BagInterface<ItemType>{
 		// or the null pointer if the entry is not in the bag.
 		Node<ItemType>* getPointerTo(const ItemType& target) const;
 		
+		// Merge sort helpers
+		Node<ItemType>* mergeSortHelper(Node<ItemType>* head);
+		Node<ItemType>* getMiddle(Node<ItemType>* head);
+		Node<ItemType>* merge(Node<ItemType>* left, Node<ItemType>* right);
+		
+		// Quicksort helpers  
+		Node<ItemType>* quickSortHelper(Node<ItemType>* head, Node<ItemType>* tail);
+		Node<ItemType>* partition(Node<ItemType>* head, Node<ItemType>* tail,
+								Node<ItemType>** newHead, Node<ItemType>** newTail);
+		Node<ItemType>* getTail(Node<ItemType>* head);
+		
 	public:
 		LinkedBag();
 		LinkedBag(const LinkedBag<ItemType>& aBag); // Copy constructor
@@ -27,10 +38,16 @@ class LinkedBag : public BagInterface<ItemType>{
 		
 		//   SORTING ----------------------------------------------------
 		void sort(int method=0);
-		// TO DO: update prototype of merge sort based on your implementation
+		/**
+		 * Sorts the LinkedBag using merge sort algorithm.
+		 * Time complexity: O(n log n)
+		 */
 		void mergeSort(); 
-		// EXTRA CREDIT 
-		// TO DO: update prototype of quick sort based on your implementation
+		
+		/**
+		 * Sorts the LinkedBag using quicksort algorithm (Extra Credit).
+		 * Time complexity: O(n log n) average case
+		 */
 		void quickSort();
 		// --------------------------------------------------------------
 
